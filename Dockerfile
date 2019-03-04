@@ -20,4 +20,22 @@ WORKDIR /ors-core
 # Build and install openrouteservice
 RUN mvn -f ./openrouteservice/pom.xml package -DskipTests 
 
-CMD ORS_VER=$(mvn -f ./openrouteservice/pom.xml -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec) && cp /ors-core/openrouteservice/target/openrouteservice-$ORS_VER.war /ors-core/build/ors.war
+# TOMCAT
+
+RUN apt-get update && apt-get -y install openjdk-8-jdk wget nano maven
+
+RUN mkdir /usr/local/tomcat
+
+RUN wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.32/bin/apache-tomcat-8.0.32.tar.gz -O /tmp/tomcat.tar.gz
+
+RUN cd /tmp && tar xvfz tomcat.tar.gz
+RUN cp -R /tmp/apache-tomcat-8.0.32/* /usr/local/tomcat/
+
+#RUN touch /usr/local/tomcat/bin/setenv.sh
+#RUN echo "CATALINA_OPTS=\"$CATALINA_OPTS\"" >> /usr/local/tomcat/bin/setenv.sh
+#RUN echo "JAVA_OPTS=\"$JAVA_OPTS\"" >> /usr/local/tomcat/bin/setenv.sh
+
+RUN cp /ors-core/openrouteservice/target/openrouteservice-$ORS_VER.war /usr/local/tomcat/webapps/ors.war
+
+EXPOSE 8080
+CMD /usr/local/tomcat/bin/catalina.sh run

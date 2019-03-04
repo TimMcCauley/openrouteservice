@@ -16,6 +16,7 @@ node('master') {
 
     stage('SCM') {
         checkout scm
+        sh "git checkout development"
     }
 
     stage('Build') {
@@ -38,6 +39,41 @@ node('master') {
             }
         }
     }
+
+    stage('Check Env') {
+        // check the current active environment to determine the inactive one that will be deployed to
+
+        withCredentials([azureServicePrincipal(servicePrincipalId)]) {
+            // fetch the current service configuration
+            sh """
+              az login --service-principal -u "\$AZURE_CLIENT_ID" -p "\$AZURE_CLIENT_SECRET" -t "\$AZURE_TENANT_ID"
+              az account set --subscription "\$AZURE_SUBSCRIPTION_ID"
+              az aks get-credentials --resource-group "${resourceGroup}" --name "${aks}" --admin --file kubeconfig
+              az logout
+              current_role="\$(kubectl --kubeconfig kubeconfig get services ors-service --output json | jq -r .spec.selector.role)"
+              if [ "\$current_role" = null ]; then
+                  echo "Unable to determine current environment"
+                  exit 1
+              fi
+              echo "\$current_role" >current-environment
+            """
+        }
+
+        // parse the current active backend
+        currentEnvironment = readFile('current-environment').trim()
+
+        // set the build name
+        echo "***************************  CURRENT: $currentEnvironment     NEW: ${newEnvironment()}  *****************************"
+        currentBuild.displayName = newEnvironment().toUpperCase() + ' ' + imageName
+
+        env.TARGET_ROLE = newEnvironment()
+
+        // clean the inactive environment
+        sh """
+          kubectl --kubeconfig=kubeconfig delete deployment "orsapp-deployment-\$TARGET_ROLE"
+        """
+    }
+
 
 }
 
