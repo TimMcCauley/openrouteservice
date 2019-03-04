@@ -16,8 +16,6 @@ node('master') {
 
     stage('SCM') {
         checkout scm
-        sh "git checkout development"
-        sh "git pull"
     }
 
     stage('Build') {
