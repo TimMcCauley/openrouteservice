@@ -19,11 +19,10 @@ node('master') {
     }
 
     stage('Build') {
-        withCredentials([azureServicePrincipal(servicePrincipalId)]) {
+          ([azureServicePrincipal(servicePrincipalId)]) {
             sh """
                 az login --service-principal -u "\$AZURE_CLIENT_ID" -p "\$AZURE_CLIENT_SECRET" -t "\$AZURE_TENANT_ID"
                 az account set --subscription "\$AZURE_SUBSCRIPTION_ID"
-                //sh mvn clean install
                 az logout
             """
         }
@@ -33,7 +32,6 @@ node('master') {
         withDockerRegistry([credentialsId: dockerCredentialId, url: "http://${dockerRegistry}"]) {
             dir('target') {
                 sh """
-                    //cp -f ../src/aks/Dockerfile .
                     docker build -t "${env.IMAGE_TAG}" .
                     docker push "${env.IMAGE_TAG}"
                 """
