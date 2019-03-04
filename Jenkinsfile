@@ -7,7 +7,7 @@ node('master') {
     def dockerRegistry = 'orscontainerregistry.azurecr.io'
     def imageName = "todo-app:${env.BUILD_NUMBER}"
     env.IMAGE_TAG = "${dockerRegistry}/${imageName}"
-    def dockerCredentialId = '/subscriptions/cbd91219-7204-4531-81d0-b1f4bee7fe05/resourceGroups/orsResourceGroup/providers/Microsoft.ContainerRegistry/registries/orsContainerRegistry'
+    def dockerCredentialId = '88199ed2-a084-4bf2-8091-8bee8070142a'
 
     def currentEnvironment = 'blue'
     def newEnvironment = { ->
@@ -32,7 +32,6 @@ node('master') {
         withDockerRegistry([credentialsId: dockerCredentialId, url: "http://${dockerRegistry}"]) {
             dir('target') {
                 sh """
-                    //cp -f ../src/aks/Dockerfile .
                     docker build -t "${env.IMAGE_TAG}" .
                     docker push "${env.IMAGE_TAG}"
                 """
