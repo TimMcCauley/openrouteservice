@@ -5,7 +5,7 @@ node('master') {
     def aks = 'orsKubernetesAKS'
 
     def dockerRegistry = 'orscontainerregistry.azurecr.io'
-    def imageName = "todo-app:${env.BUILD_NUMBER}"
+    def imageName = "ors-app:${env.BUILD_NUMBER}"
     env.IMAGE_TAG = "${dockerRegistry}/${imageName}"
     def dockerCredentialId = '88199ed2-a084-4bf2-8091-8bee8070142a'
 
@@ -30,7 +30,7 @@ node('master') {
 
     stage('Docker Image') {
         withDockerRegistry([credentialsId: dockerCredentialId, url: "http://${dockerRegistry}"]) {
-            dir('target') {
+            dir('.') {
                 sh """
                     docker build -t "${env.IMAGE_TAG}" .
                     docker push "${env.IMAGE_TAG}"
