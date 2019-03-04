@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: orsapp-test-blue
+  labels:
+    app: orsapp
+    role: test-blue
+spec:
+  type: LoadBalancer
+  selector:
+    app: orsapp
+    role: blue
+  ports:
+    - port: 80
+      targetPort: 8080
