@@ -1,6 +1,6 @@
 node('master') {
 
-    def servicePrincipalId = 'c1d750ff-1e0d-4eb3-9bf2-aedc25a12be1'
+    def servicePrincipalId = '04d30485-dd26-42f0-bc3f-9c94be7f0c9a'
     def resourceGroup = 'orsResourceGroup'
     def aks = 'orsKubernetesAKS'
 
