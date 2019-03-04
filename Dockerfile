@@ -19,7 +19,7 @@ WORKDIR /ors-core
 
 # Build and install openrouteservice
 RUN mvn -f ./openrouteservice/pom.xml package -DskipTests 
-RUN ORS_VER=$(mvn -f ./openrouteservice/pom.xml -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
+ENV ORS_VER=$(mvn -f ./openrouteservice/pom.xml -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
 
 # TOMCAT
 
