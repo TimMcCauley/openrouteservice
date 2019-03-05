@@ -73,6 +73,20 @@ node('master') {
         """
     }
 
+    stage('Deploy') {
+      // Apply the deployments to AKS.
+      // With enableConfigSubstitution set to true, the variables ${TARGET_ROLE}, ${IMAGE_TAG}, ${KUBERNETES_SECRET_NAME}
+      // will be replaced with environment variable values
+      acsDeploy azureCredentialsId: servicePrincipalId,
+                resourceGroupName: resourceGroup,
+                containerService: "${aks} | AKS",
+                configFilePaths: './deploy/aks/deployment.yml',
+                enableConfigSubstitution: true,
+                secretName: dockerRegistry,
+                containerRegistryCredentials: [[credentialsId: dockerCredentialId, url: "http://${dockerRegistry}"]]
+      
+    }
+
 
 }
 
